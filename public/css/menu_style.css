@@ -1,0 +1,39 @@
+section#intro-header {
+    background-image: url(../img/home_img.png);
+    background-size: cover;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    margin: auto;
+}
+
+section#intro-header .wrap-headline {
+    position: relative;
+    padding-top: 20%;
+    padding-bottom: 20%;
+}
+
+section#intro-header h1,
+section#intro-header h2 {
+    color: rgb(0, 0, 0);
+}
+
+section#intro-header h2 {
+    font-size: 1.5rem;
+}
+
+section#intro-header hr {
+    width: 10%;
+}
+
+section#intro-header .btn-default1 {
+    background-color: rgba(255, 255, 255, 0.829);
+    border: none;
+}
+section#intro-header .btn-default2 {
+    background-color: rgba(94, 94, 94, 0.8);
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    width: 5em;
+    border: none;
+}
+

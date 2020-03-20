@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>project test</title>
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="css/bootstrap.min.css"><br/>
+    <script type="text/javascript">
+      function focus_init(){
+        var line_amount = Object.keys(option["series"]).length;
+        for(i=0 ; i<line_amount ; i++){
+          option["series"][i]["itemStyle"]["normal"]["lineStyle"]["width"]=2;
+        }
+      }
+      function ff(x){
+        option["series"][x]["itemStyle"]["normal"]["lineStyle"]["width"]=5;
+      }
+
+      var count=0;
+      function addbox()
+      {
+        var nnn = document.getElementById("a5");
+        var checkbox = document.createElement('input'); 
+        checkbox.type= 'checkbox';
+        checkbox.name = 'haha';
+        checkbox.id = ++count;
+        console.log(checkbox);
+        nnn.appendChild(checkbox);
+        var nl = document.createElement('br');
+        nnn.appendChild(nl);
+      }
+      function killbox()
+      {
+        var kel = document.getElementById(count--);
+        kel.remove(kel);
+        console.log("kill checkboxId:",count+1);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="jumbotron">
+          <h1>-Chart Test 0515-</h1>
+        </div>
+      </div>
+      <div id="d1" class="row">
+        <div class="col-md-3">
+          <h3 class="text-left">Chart Setting</h3>
+          <blockquote>
+            <p class="text-center">Focus</p>
+            <input type="radio" name="Focus" onchange="focus_init();ff(0);"/>port2<br>
+            <input type="radio" name="Focus" onchange="focus_init();ff(1);"/>port7<br>
+            <input type="radio" name="Focus" onchange="focus_init();"/>other<br>
+          </blockquote>
+          <blockquote id="a5">
+            <p class="text-center">Disappear</p>
+            <input type="checkbox" name="Port2_d"/>port2<br>
+            <input type="checkbox" name="Port2_d"/>port7<br>
+            
+            <br><input id="a_box" type="button" onclick="addbox()" value="Add new box"/><br>
+            <input id="k_box" type="button" onclick="killbox()" value="kill a box"/><br>
+          </blockquote>
+        </div>
+        <div class="col-md-8">
+          <div id="main" style="height:400px"></div>
+          <!-- ECharts單文件引入-->
+          <script src="./js/echarts.js"></script>
+          <script src="./js/jquery-3.4.0.js"></script>
+          <script type="text/javascript">
+            // 路徑配置
+            require.config({
+              paths: {
+                echarts: "./js"
+              }
+            });
+
+            var option = {
+              title:{
+                text: 'Chart view',
+                subtext: '2019/05/15'
+              },
+              tooltip: {
+                show: true
+              },/*
+              legend: {
+                data: ['port2','port7']
+              },*/
+              xAxis: [
+                {
+                  type: 'category',
+                  data: ['','','','','','','','','','']
+                }
+              ],
+              yAxis: [
+                {
+                  type: 'value'
+                }
+              ],
+              series: [
+                {
+                  name: "port2",
+                  type: "line",
+                  data: [0],
+                  itemStyle: {
+                    normal: {
+                      lineStyle: {
+                        width: 2
+                      }
+                    }
+                  }
+                },
+                {
+                  name: "port7",
+                  type: "line",
+                  data: [0],
+                  itemStyle: {
+                    normal: {
+                      lineStyle: {
+                        width: 2
+                      }
+                    }
+                  }
+                }
+              ]
+            };
+            require(
+                    [
+                      'echarts',
+                      'echarts/chart/line'
+                    ],
+                    
+                    function (ec) {
+                      var myChart = ec.init(document.getElementById('main'));
+                      setInterval(function(){
+                        var date = new Date();
+                        var now_time = date.getMinutes()+':'+date.getSeconds();
+
+                        $.ajax({
+                          url: "../static/sdn_monitor_10.json",
+                          type: 'GET',
+                          dataType: 'json',
+                          success: (data)=>{
+                            var data_length = option.series[0].data.length;
+
+                            if(data_length<10){
+                              option.xAxis[0].data.splice(data_length,1,now_time);
+                              option.series[0].data.push(data.port2[0].tx_rate);
+                              option.series[1].data.push(data.port7[0].tx_rate);                              
+                            }else{
+                              option.xAxis[0].data.push(now_time);
+                              option.xAxis[0].data.shift();
+                              option.series[0].data.shift();
+                              option.series[1].data.shift();
+                            }
+                          }
+                        });
+                        //
+                        option.legend = {data: ['port2','port7']};
+                        option.legend.data.pop('port10');
+                        //
+                        myChart.setOption(option);
+                      },1002);
+                    }
+            );
+          </script>
+        </div>
+        <div class="col-md-1"></div>
+      </div>
+    </div><br/>
+    <script src="./js/bootstrap.min.js"></script>
+  </body>
+</html>

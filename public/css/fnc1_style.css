@@ -1,0 +1,14 @@
+.chartstyle {
+    width: 95%;
+    margin: auto;
+}
+
+#line_window {
+    margin-left: 0%;
+    width: 100%
+}
+
+#pie_window {
+    margin-left: 0%;
+    width: 100%;
+}

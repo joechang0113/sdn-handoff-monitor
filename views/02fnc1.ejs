@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><!--zh-CN可優化中文字體-->
+<head>
+    <!--190521: html backbone-->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>流量監控</title>
+    <link rel="icon" href="http://127.0.0.1:3000/img/icon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="css/bootstrap.min.css"><br/>
+    <link rel="stylesheet" href="css/mytheme.css"><br/>
+    <link rel="stylesheet" href="css/fnc1_style.css"><br/>
+    <script src="./js/jquery-3.4.0.js"></script> 
+</head>
+<body>
+    <!--190918: boostrap 4優化網頁,製作按鈕樣式分頁系統-->
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="http://127.0.0.1:3000/dashboard">Demo</a>
+                <button type="button" class="navbar-toggle collapsed" 
+                        data-toggle="collapse" data-target="#nav-menu" aria-expanded="false">
+                    <span class="sr-only"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-primary" onclick="javascript:window.location.reload();">重新整理</button>
+            </div>
+            <div id="nav-menu" class="collapse navbar-collapse navbar-right">
+                <ul class="nav navbar-nav">
+                    <li><a><u><b>流量監控</b></u></a></li>
+                    <li><a href="http://127.0.0.1:3000/fnc2" target="_blank">農業數據監控</a></li>
+                    <!--li><a href="http://127.0.0.1:3000/fnc3" target="_blank">農業區影像監控</a></li-->
+                    <!--li><a href="http://127.0.0.1:3000/fnc4" target="_blank">空拍影像</a></li-->
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="col-md-12"><h3><b>流量監控</b></h3></div>
+    <div class="col-md-8">
+        <div id="line_window" style="height:400px"></div>
+    </div>
+    <div class="col-md-4">
+        <div id="pie_window" style="height:400px"></div>
+    </div>
+    <script src="./js/echarts.js"></script>
+    <script src="./js/jquery-3.4.0.js"></script>
+    <script type="text/javascript">
+        require.config({ paths: { echarts: "./js" } });
+        //190930: 寫死port避免順序一直跑亂,不好看
+        var port = [{ id: 'port4', name: 'Electronic Fences', rate: 0 }, { id: 'port8', name: 'Others', rate: 0 }];
+        //190521: line chart
+        var option_line = {
+            title: {
+                text: 'line chart',
+                //subtext: '123456',
+                padding: [0, 0, 0, 30],
+                x: 'left', y: 'top'
+            },
+            tooltip: {
+                show: true,
+                trigger: 'axis',
+                formatter: null,
+                showDelay: 20,
+                axisPointer: { type: 'line' },
+                textStyle: { fontSize: 18 }//default size:14
+            },
+            legend: {
+                //selectedMode: false,
+                data: [port[0].name, port[1].name]
+            },
+            xAxis: [{
+                type: 'category',
+                data: ['', '', '', '', '', '', '', '', '', ''],
+                name: "time"
+            }],
+            yAxis: [{
+                type: 'value',
+                axisLabel: { formatter: '{value} Mbps' },
+                name: "Data Rate"
+            }],
+            series: [
+                { id: port[0].id, name: port[0].name, type: "line", smooth: true, data: [0] },
+                { id: port[1].id, name: port[1].name, type: "line", smooth: true, data: [0] }
+                //屬性-線段粗細:itemStyle: {normal: {lineStyle: {width: 2}}}
+            ]
+        };
+        //191005: pie chart function
+        var option_pie = {
+            title: {
+                text: 'pie chart',
+                padding: [0, 0, 0, 30],
+                x: 'left', y: 'top'
+            },
+            tooltip: {
+                show: false
+            },
+            series: [
+                {
+                    name: '',
+                    type: 'pie',
+                    radius: '50%',
+                    center: ['50%', '50%'],
+                    data: [
+                        { id: port[0].id, value: 1, name: port[0].name },
+                        { id: port[1].id, value: 1, name: port[1].name },
+                        { id: port[2].id, value: 1, name: port[2].name },
+                    ]
+                }
+            ]
+        };
+        var chart_counter = 0;
+        require(
+            ['echarts', 'echarts/chart/line', 'echarts/chart/pie'],
+            function (ec) {
+                var myLineChart = ec.init(document.getElementById('line_window'));
+                var myPieChart = ec.init(document.getElementById('pie_window'));
+                //191016: 異常情況:滑鼠點擊線段
+                myLineChart.on('click', function (params) {
+                    console.log(params);
+                });
+                //191016: 異常情況:滑鼠點擊圖例
+                myLineChart.on('legendSelected', function (params) {
+                    console.log(params);
+                });
+                //190521: 正常情況:輸出圖形
+                //190918: jquery-ajax read local file
+                setInterval(function () {
+                    var date = new Date();
+                    var now_time = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();//新增時間軸
+                    $.ajax({
+                        url: "../static/sdn_monitor_10.json",//抓取檔案資料
+                        type: 'GET',
+                        dataType: 'json',
+                        success: (data) => {
+                            var i, j, rate_total = 0, rate_amount = Object.keys(data).length;
+                            //191004: 資料預處理
+                            for (i = 0; i < rate_amount; i++) {
+                                //若值為負則變成0
+                                Object.values(data)[i][0].tx_rate = (Object.values(data)[i][0].tx_rate < 0) ? 0 : Object.values(data)[i][0].tx_rate;
+                                rate_total += Object.values(data)[i][0].tx_rate;
+                            }
+                            //190918: 將.json的資料塞入
+                            if (chart_counter < 10) {
+                                option_line.xAxis[0].data[chart_counter] = now_time;
+                                for (i = 0; i < rate_amount; i++) {
+                                    //190930: chart標籤自適應json的port名稱
+                                    for (j = 0; j < rate_amount; j++) {
+                                        if (option_line.series[j].id == Object.keys(data)[i]) {
+                                            option_line.series[j].data[chart_counter] = Object.values(data)[i][0].tx_rate;
+                                            port[j].rate = Object.values(data)[i][0].tx_rate;
+                                        }
+                                    }
+                                }
+                                //191005: 顯示數值改成百分比
+                                for (i = 0; i < rate_amount; i++) {
+                                    port[i].rate = (port[i].rate / rate_total * 100).toFixed(2);
+                                }
+                                //191005: pie chart
+                                for (i = 0; i < rate_amount; i++) {
+                                    option_pie.series[0].data[i].value = option_line.series[i].data[chart_counter];
+                                    option_pie.series[0].data[i].name = port[i].name + '(' + port[i].rate + '%)';
+                                }
+                                chart_counter++;
+                            }
+                            //190918: 刪掉overflow的資料
+                            else {
+                                option_line.xAxis[0].data.push(now_time);
+                                option_line.xAxis[0].data.shift();
+                                for (i = 0; i < rate_amount; i++) {
+                                    //190930: chart標籤自適應json的port名稱
+                                    for (j = 0; j < rate_amount; j++) {
+                                        if (option_line.series[j].id == Object.keys(data)[i]) {
+                                            option_line.series[j].data.push(Object.values(data)[i][0].tx_rate);
+                                            option_line.series[j].data.shift();
+                                            port[j].rate = Object.values(data)[i][0].tx_rate;
+                                        }
+                                    }
+                                }
+                                //191005: 顯示數值改成百分比
+                                for (i = 0; i < rate_amount; i++) {
+                                    port[i].rate = (port[i].rate / rate_total * 100).toFixed(2);
+                                }
+                                //191005: pie chart
+                                for (i = 0; i < rate_amount; i++) {
+                                    option_pie.series[0].data[i].value = option_line.series[i].data[9];
+                                    option_pie.series[0].data[i].name = port[i].name + '(' + port[i].rate + '%)';
+                                }
+                            }
+                        }
+                    });
+                    myLineChart.setOption(option_line);
+                    myPieChart.setOption(option_pie);//分兩個div作圖比較容易分配顯示畫面的比例
+                    //191016: 獲取option所有屬性
+                    //console.log(myLineChart.getOption());
+                    //console.log(myPieChart.getOption());
+                }, 1002);
+            }
+        );
+    </script>
+    <script src="./js/bootstrap.min.js"></script>
+</body>
+</html>

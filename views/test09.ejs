@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!--若要擴展至行動裝置再啟用此行>
+        <meta name="viewport" content="width=device-width, initial-scale=1"-->
+        <title>Dashboard</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css"><br/>
+        <link rel="stylesheet" href="css/mytheme.css"><br/>
+        <script src="./js/jquery-3.4.0.js"></script> 
+    </head>
+<body>
+    <!--nav class="navbar navbar-default navbar-fixed-top"-->
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="http://127.0.0.1:3000/menu">Demo</a>
+                <button type="button" class="navbar-toggle collapsed" 
+                        data-toggle="collapse" data-target="#nav-menu" aria-expanded="false">
+                    <span class="sr-only"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="btn-group pull-right">
+                <script language="javascript">
+                    function op1() {
+                        window.open("http://127.0.0.1:3000/img/01.png","簡介","width=1000,height=1000,left=500,top=1000");
+                    }
+                    function op2() {
+                        window.open("http://127.0.0.1:3000/img/02.png","流程","width=1000,height=1000,left=500,top=1000");
+                    }
+                </script>
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" 
+                        aria-haspopup="true" aria-expanded="false">info<span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" onclick="op1()">簡介</a></li>
+                    <li><a href="#" onclick="op2()">Demo流程</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#" onclick="javascript:window.location.reload();">重新整理</a></li>
+                </ul>
+            </div>
+            <div id="nav-menu" class="collapse navbar-collapse navbar-right">
+                <ul class="nav navbar-nav">
+                    <li><a href="http://127.0.0.1:3000" target="_blank">農業數據監控</a></li>
+                    <li><a href="http://127.0.0.1:3000" target="_blank">農業區影像監控</a></li>
+                    <li><a href="http://127.0.0.1:3000" target="_blank">空拍影像</a></li>
+                    <li><a href="http://127.0.0.1:3000" target="_blank">流量監控</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div>
+        <img src="../img/uav_dashboard.png" width="720">
+    </div>
+
+    <script src="./js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>project test</title>
+  <!--Bootstrap-->
+  <link rel="stylesheet" href="css/bootstrap.min.css"><br />
+  <script type="text/javascript">
+    function FocusOn(x) {
+		console.log('FocusOn ',x);
+		//所有線段初始化
+		var line_amount = Object.keys(option["series"]).length;
+		for (i = 0; i < line_amount; i++) {
+		  option["series"][i]["itemStyle"]["normal"]["lineStyle"]["width"] = 2;
+		}
+		//該線段調粗
+		option["series"][x]["itemStyle"]["normal"]["lineStyle"]["width"] = 5;
+	}
+	function pp(){
+		console.log("haha");
+	};
+
+    var count = 0;
+    function addbox() {
+		var NewContext = document.getElementById("PortController");
+		var checkbox = document.createElement('input');
+		checkbox.addEventListener('change',function(){pp();})
+		checkbox.type = 'radio';
+		checkbox.name = 'Focus';
+		
+		//checkbox.onchange = pp;
+		checkbox.id = option.legend.data[count];
+		NewContext.appendChild(checkbox);
+		console.log("Tag Added",checkbox);
+		NewContext.innerHTML += '123';
+		var nl = document.createElement('br');
+		NewContext.appendChild(nl);
+    }
+    function killbox() {
+      var kel = document.getElementById(count--);
+      kel.remove(kel);
+      console.log("kill checkboxId:", count + 1);
+    }
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <div id="d1" class="row">
+        <div id="main" style="height:400px"></div>
+        <script src="./js/echarts.js"></script>
+        <script src="./js/jquery-3.4.0.js"></script>
+        <script type="text/javascript">
+          require.config({
+            paths: {
+              echarts: "./js"
+            }
+          });
+          var option = {
+            title: {
+              text: 'Chart view',
+              subtext: '2019/05/15',
+              x: 'left', y: 'top'
+            },
+            tooltip: {
+              show: true,
+              trigger: 'axis',
+              formatter: null,
+              showDelay: 20,
+              axisPointer: {
+                type: 'line',
+              }
+            },
+            legend: {
+              data: ['Camera','Others']
+            },
+            xAxis: [
+              {
+                type: 'category',
+                data: ['', '', '', '', '', '', '', '', '', ''],
+                name: "time"
+              }
+            ],
+            yAxis: [
+              {
+                type: 'value',
+                name: "Rate(%)"
+              }
+            ],
+            series: [
+              {
+                name: "Camera",
+                type: "line",
+                data: [48,48,50,50,49,50,48,48, 50, 50],
+                symbol: 'none',
+                itemStyle: {
+                  normal: {
+                    lineStyle: {
+                      width: 3
+                    }
+                  }
+                }
+              },
+              {
+                name: "Others",
+                type: "line",
+                data: [50,50,50,50,49,49,50,50,49,49],
+                symbol: 'none',
+                itemStyle: {
+                  normal: {
+                    lineStyle: {
+                      width: 3
+                    }
+                  }
+                }
+              }
+            ]
+          };
+          var chart_counter = 0;
+          require(
+            [
+              'echarts',
+              'echarts/chart/line'
+            ],
+
+            function (ec) {
+              var myChart = ec.init(document.getElementById('main'));
+              setInterval(function () {
+                var date = new Date();
+                var now_time = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+
+                
+                option.xAxis[0].data.push(now_time);
+                option.xAxis[0].data.shift();
+                myChart.setOption(option);
+              }, 1002);
+            }
+          );
+        </script>
+    </div>
+  </div><br />
+  <script src="./js/bootstrap.min.js"></script>
+</body>
+
+</html>

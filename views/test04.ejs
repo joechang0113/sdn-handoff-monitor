@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<!--(1)處理掉echart.js都會從0點開始的問題
+    (2)依照讀入的json檔案新增chart線條-->
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>project test</title>
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="css/bootstrap.min.css"><br />
+    <!--script type="text/javascript">
+        function FocusOn(x) {
+            console.log('FocusOn ',x);
+            //所有線段初始化
+            var line_amount = Object.keys(option["series"]).length;
+            for (i = 0; i < line_amount; i++) {
+                option["series"][i]["itemStyle"]["normal"]["lineStyle"]["width"] = 2;
+            }
+            //該線段調粗
+            option["series"][x]["itemStyle"]["normal"]["lineStyle"]["width"] = 5;
+        }
+        function pp(){
+            console.log("haha");
+        };
+
+        var count = 0;
+        function addbox() {
+            var NewContext = document.getElementById("PortController");
+            var checkbox = document.createElement('input');
+            checkbox.addEventListener('change',function(){pp();})
+            checkbox.type = 'radio';
+            checkbox.name = 'Focus';
+
+            //checkbox.onchange = pp;
+            checkbox.id = option.legend.data[count];
+            NewContext.appendChild(checkbox);
+            console.log("Tag Added",checkbox);
+            NewContext.innerHTML += '123';
+            var nl = document.createElement('br');
+            NewContext.appendChild(nl);
+        }
+        function killbox() {
+            var kel = document.getElementById(count--);
+            kel.remove(kel);
+            console.log("kill checkboxId:", count + 1);
+        }
+    </script-->
+</head>
+
+<body>
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="http://127.0.0.1:3000/menu">Demo</a>
+                <button type="button" class="navbar-toggle collapsed" 
+                    data-toggle="collapse" data-target="#nav-menu" aria-expanded="false">
+                    <span class="sr-only"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="btn-group pull-right">
+                <script language="javascript">
+                    function op1() {
+                        window.open("http://127.0.0.1:3000/img/01.png","簡介","width=1000,height=1000,left=500,top=1000");
+                    }
+                    function op2() {
+                        window.open("http://127.0.0.1:3000/img/02.png","流程","width=1000,height=1000,left=500,top=1000");
+                    }
+                </script>
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" 
+                    aria-haspopup="true" aria-expanded="false">info<span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" onclick="op1()">簡介</a></li>
+                    <li><a href="#" onclick="op2()">Demo流程</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#" onclick="javascript:window.location.reload();">重新整理</a></li>
+                </ul>
+            </div>
+            <div id="nav-menu" class="collapse navbar-collapse navbar-right">
+                <ul class="nav navbar-nav">
+                    <li><a href="http://127.0.0.1:3000" target="_blank">農業數據監控</a></li>
+                    <li><a href="http://127.0.0.1:3000" target="_blank">農業區影像監控</a></li>
+                    <li><a href="http://127.0.0.1:3000" target="_blank">空拍影像</a></li>
+                    <li><a href="http://127.0.0.1:3000" target="_blank">流量監控</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div id="d1" class="row">
+            <!--div class="col-md-3">
+                <h3 class="text-left">Chart Setting</h3>
+                <blockquote id="PortController">
+                    <p class="text-left">&emsp;- Focus -</p>
+                    <input type="radio" name="Focus" onchange="FocusOn(0);" />port24(controller)<br>
+                </blockquote>
+                <blockquote id="a5">
+                    <br><input id="a_box" type="button" onclick="addbox()" value="Add new box" /><br>
+                    <input id="k_box" type="button" onclick="killbox()" value="kill a box" /><br>
+                </blockquote>
+            </div-->
+            <div class="col-md-9">
+                <div id="main" style="height:400px"></div>
+                <script src="./js/echarts.js"></script>
+                <script src="./js/jquery-3.4.0.js"></script>
+                <script type="text/javascript">
+                    require.config({
+                        paths: {
+                            echarts: "./js"
+                        }
+                    });
+                    var option = {
+                        title: {
+                            text: 'Chart view',
+                            subtext: '2019/05/15',
+                            x: 'left', y: 'top'
+                        },
+                        toolbox: {
+                            show: true,
+                            feature: {
+                                //mark: { show: true },
+                                //dataView: { show: true, readOnly: false },
+                                //restore: { show: true },
+                                //saveAsImage: { show: true }
+                            }
+                        },
+                        tooltip: {
+                            show: true,
+                            trigger: 'axis',
+                            formatter: null,
+                            showDelay: 20,
+                            axisPointer: {
+                                type: 'line',
+                            }
+                        },
+                        legend: {
+                            data: ['port24']
+                            //data: ['port24','port2','port7']
+                        },
+                        xAxis: [{
+                            type: 'category',
+                            data: ['', '', '', '', '', '', '', '', '', ''],
+                            name: "time"
+                        }],
+                        yAxis: [{
+                            type: 'value',
+                            name: "Data Rate(Mbps)"
+                        }],
+                        series: [{
+                            name: "port24",
+                            type: "line",
+                            data: [0],
+                            //symbol: 'none',
+                            itemStyle: {normal: {lineStyle: {width: 2}}}
+                        }]
+                    };
+                    var chart_counter = 0;
+                    require(
+                        [
+                            'echarts',
+                            'echarts/chart/line'
+                        ],
+                        function (ec) {
+                            var myChart = ec.init(document.getElementById('main'));
+                            setInterval(function () {
+                                var date = new Date();
+                                var now_time = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+                                $.ajax({
+                                    url: "../static/sdn_monitor_10.json",
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    success: (data) => {
+                                        var data_length = option.series[0].data.length;//以control port的資料數為依據
+                                        var i;
+                                        //check 圖表port數是否與.json相同,若否則更新
+                                        //目前做新增功能//待做移除功能
+                                        if (option.legend.data.length < Object.keys(data).length) {
+                                            for (i = 0; i < Object.keys(data).length; i++) {
+                                                if (option.legend.data[i] == Object.keys(data)[i]) {
+                                                    //do nothing
+                                                } else {
+                                                    option.legend.data.push(Object.keys(data)[i]);
+                                                    option.series.push({
+                                                        name: "",
+                                                        type: "line",
+                                                        data: [, , , , , , , , , ,],
+                                                        itemStyle: {normal: {lineStyle: {width: 2}}}
+                                                    });
+                                                    option.series[i].name = Object.keys(data)[i];
+                                                }
+                                            }
+                                            console.log(option.legend.data);
+                                            console.log(option.series);
+                                        }
+                                        var JSON_amount = Object.keys(data).length;
+                                        //將.json的資料塞入
+                                        if (chart_counter < 10) {
+                                            option.xAxis[0].data[chart_counter] = now_time;
+                                            for (i = 0; i < JSON_amount; i++) {
+                                                option.series[i].data[chart_counter] = Object.values(data)[i][0].tx_rate;
+                                            }
+                                            chart_counter++;
+                                        }
+                                        //刪掉overflow的資料
+                                        else {
+                                            option.xAxis[0].data.push(now_time);
+                                            option.xAxis[0].data.shift();
+                                        for (i = 0; i < JSON_amount; i++) {
+                                            option.series[i].data.push(Object.values(data)[i][0].tx_rate);
+                                            option.series[i].data.shift();
+                                        }
+                                        }/*
+                                        console.log(option.series[0].data);
+                                        console.log(option.series[1].data);
+                                        console.log(option.series[2].data);
+                                        console.log(option.series[3].data);*/
+                                    }
+                                });
+                                myChart.setOption(option);
+                            }, 1002);
+                        }
+                    );
+                </script>
+            </div>
+        </div>
+    </div><br/>
+    <script src="./js/bootstrap.min.js"></script>
+</body>
+
+</html>
